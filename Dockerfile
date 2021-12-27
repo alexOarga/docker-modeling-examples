@@ -30,15 +30,22 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
+# Note: install notebook as root! Or else it will not run
+RUN pip install --no-cache-dir notebook
+
+WORKDIR /home/jovyan
+
+COPY --from=buildexamples /home/jovyan .
+
+# Now we install python libraries as user libraries as they will be run by this user.
 # Change /home/jovyan permissions to make the user we created the owner
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
-# Add .local/bin to path to include jupyter (among other)
+# Add .local/bin to path
 ENV PATH="/home/jovyan/.local/bin:${PATH}"
 
-RUN pip install --no-cache-dir notebook
 RUN python -m pip install \
         matplotlib \
         numpy \
@@ -48,15 +55,6 @@ RUN python -m pip install \
         xlrd==1.2.0 \
     && python -m pip install gurobipy==${GRB_VERSION} \
     && mkdir -p /home/jovyan
-
-WORKDIR /home/jovyan
-
-COPY --from=buildexamples /home/jovyan .
-
-# Change /home/jovyan permissions to make the user we created the owner
-USER root
-RUN chown -R ${NB_UID} ${HOME}
-USER ${NB_USER}
 
 ENTRYPOINT ["jupyter", "notebook", "--no-browser", "--allow-root" ]
 
