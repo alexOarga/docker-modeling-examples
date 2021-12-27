@@ -25,9 +25,6 @@ ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
-# Add .local/bin to path to include jupyter (among other)
-ENV PATH="/home/jovyan/.local/bin:${PATH}"
-
 RUN adduser --disabled-password \
     --gecos "Default user" \
     --uid ${NB_UID} \
@@ -37,6 +34,9 @@ RUN adduser --disabled-password \
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
+
+# Add .local/bin to path to include jupyter (among other)
+ENV PATH="/home/jovyan/.local/bin:${PATH}"
 
 RUN pip install --no-cache-dir notebook
 RUN python -m pip install \
@@ -52,6 +52,11 @@ RUN python -m pip install \
 WORKDIR /home/jovyan
 
 COPY --from=buildexamples /home/jovyan .
+
+# Change /home/jovyan permissions to make the user we created the owner
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
 
 ENTRYPOINT ["jupyter", "notebook", "--no-browser", "--allow-root" ]
 
