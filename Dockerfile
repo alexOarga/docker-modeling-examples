@@ -30,31 +30,14 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
-# Note: install notebook as root! Or else it will not run
-RUN pip install --no-cache-dir notebook
-
 WORKDIR /home/gurobi
 
 COPY --from=buildexamples /home/gurobi .
 
-# Now we install python libraries as user libraries as they will be run by this user.
 # Change /home/gurobi permissions to make the user we created the owner
 USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
-
-# Add .local/bin to path
-ENV PATH="/home/gurobi/.local/bin:${PATH}"
-
-RUN python -m pip install \
-        matplotlib \
-        numpy \
-        pandas \
-        sklearn \
-        folium \
-        xlrd==1.2.0 \
-    && python -m pip install gurobipy==${GRB_VERSION} \
-    && mkdir -p /home/gurobi
 
 ENTRYPOINT ["jupyter", "notebook", "--no-browser", "--allow-root" ]
 
