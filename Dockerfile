@@ -30,6 +30,8 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
+RUN pip install --no-cache-dir notebook
+
 WORKDIR /home/gurobi
 
 COPY --from=buildexamples /home/gurobi .
@@ -39,7 +41,7 @@ USER root
 RUN chown -R ${NB_UID} ${HOME}
 USER ${NB_USER}
 
-ENTRYPOINT []
+ENTRYPOINT [ ]
 
 CMD ["--notebook-dir=/home/gurobi", "--NotebookApp.token=''","--NotebookApp.password=''"]
 
