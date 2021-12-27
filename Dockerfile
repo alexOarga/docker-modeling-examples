@@ -36,6 +36,23 @@ WORKDIR /home/gurobi
 
 COPY --from=buildexamples /home/gurobi .
 
+# Install python libraries as jovyan user
+USER jovyan
+RUN python -m pip install \
+        matplotlib \
+        numpy \
+        pandas \
+        sklearn \
+        folium \
+        xlrd==1.2.0 \
+    && python -m pip install gurobipy==${GRB_VERSION}
+
+# Add installation folder to path
+ENV PATH="/home/jovyan/.local/bin:${PATH}"
+
+# Return to root user
+USER root
+
 # Change /home/gurobi permissions to make the user we created the owner
 USER root
 RUN chown -R ${NB_UID} ${HOME}
