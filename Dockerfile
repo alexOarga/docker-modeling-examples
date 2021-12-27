@@ -25,6 +25,9 @@ ENV USER ${NB_USER}
 ENV NB_UID ${NB_UID}
 ENV HOME /home/${NB_USER}
 
+# Add .local/bin to path to include jupyter (among other)
+ENV PATH="/home/jovyan/.local/bin:${PATH}"
+
 RUN adduser --disabled-password \
     --gecos "Default user" \
     --uid ${NB_UID} \
