@@ -30,6 +30,11 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
+# Change /home/jovyan permissions to make the user we created the owner
+USER root
+RUN chown -R ${NB_UID} ${HOME}
+USER ${NB_USER}
+
 RUN pip install --no-cache-dir notebook
 RUN python -m pip install \
         matplotlib \
@@ -44,11 +49,6 @@ RUN python -m pip install \
 WORKDIR /home/jovyan
 
 COPY --from=buildexamples /home/jovyan .
-
-# Change /home/jovyan permissions to make the user we created the owner
-USER root
-RUN chown -R ${NB_UID} ${HOME}
-USER ${NB_USER}
 
 ENTRYPOINT ["jupyter", "notebook", "--no-browser", "--allow-root" ]
 
