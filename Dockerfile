@@ -30,6 +30,8 @@ RUN adduser --disabled-password \
     --uid ${NB_UID} \
     ${NB_USER}
 
+RUN pip install --no-cache-dir notebook
+
 WORKDIR /home/gurobi
 
 COPY --from=buildexamples /home/gurobi .
